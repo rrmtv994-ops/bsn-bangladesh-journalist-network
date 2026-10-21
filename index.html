@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BSN - বাংলাদেশ সাংবাদিক নেটওয়ার্ক</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  color: #172b4d;
+}
+header {
+  background: #006a4e;
+  color: white;
+  text-align: center;
+  padding: 25px 12px;
+}
+header h1 { margin: 0; font-size: 25px; }
+header p { margin-bottom: 0; }
+.container {
+  max-width: 650px;
+  margin: 20px auto;
+  padding: 15px;
+}
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #00000012;
+}
+h2 { color: #006a4e; }
+button {
+  background: #006a4e;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 7px;
+  font-size: 16px;
+  cursor: pointer;
+}
+input, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 8px 0 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #063d30;
+  color: white;
+}
+</style>
+</head>
+<body><header>
+  <h1>🇧🇩 BSN</h1>
+  <p>Bangladesh Journalist Network</p>
+  <p>বাংলাদেশ সাংবাদিক নেটওয়ার্ক</p>
+</header><div class="container">  <div class="card">
+    <h2>আমাদের পরিচিতি</h2>
+    <p>বাংলাদেশের সাংবাদিক ও বিভিন্ন পেশার মানুষের মধ্যে যোগাযোগ, সহযোগিতা এবং তথ্য বিনিময়ের একটি নেটওয়ার্ক গড়ে তোলাই BSN-এর লক্ষ্য।</p>
+  </div>  <div class="card">
+    <h2>BSN-এর লক্ষ্য</h2>
+    <p>সত্য, ন্যায়, পেশাগত সম্মান এবং পারস্পরিক সহযোগিতার ভিত্তিতে দেশব্যাপী যোগাযোগ বৃদ্ধি করা।</p>
+  </div>  <div class="card">
+    <h2>সদস্য যোগাযোগ</h2>
+    <p>সদস্য হওয়া বা নেটওয়ার্ক সম্পর্কে জানতে আমাদের সঙ্গে যোগাযোগ করুন।</p>
+    <button onclick="contactBSN()">যোগাযোগ করুন</button>
+  </div>  <div class="card">
+    <h2>আপনার মতামত</h2>
+    <label for="name">আপনার নাম</label>
+    <input id="name" type="text" placeholder="আপনার নাম লিখুন"><label for="message">আপনার মতামত</label>
+<textarea id="message" rows="4" placeholder="আপনার মতামত লিখুন"></textarea>
+
+<button onclick="sendMessage()">মতামত পাঠান</button>
+<p id="result"></p>
+
+  </div></div><footer>
+  <p>BSN — বাংলাদেশ সাংবাদিক নেটওয়ার্ক</p>
+  <p>সত্য • ঐক্য • সহযোগিতা</p>
+</footer><script>
+function contactBSN() {
+  alert("BSN-এর যোগাযোগের তথ্য শিগগিরই যুক্ত করা হবে।");
+}
+
+function sendMessage() {
+  const name = document.getElementById("name").value.trim();
+  const message = document.getElementById("message").value.trim();
+
+  if (!name || !message) {
+    alert("অনুগ্রহ করে আপনার নাম ও মতামত লিখুন।");
+    return;
+  }
+
+  document.getElementById("result").textContent =
+    "ধন্যবাদ, " + name + "! আপনার মতামত এই নমুনা পেজে লেখা হয়েছে। এটি এখনো সার্ভারে পাঠানো হয়নি।";
+}
+</script></body>
+</html>
