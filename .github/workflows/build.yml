@@ -22,8 +22,11 @@ jobs:
       - name: Build with Capacitor
         run: |
           cd web-app
+          mkdir -p www
+          for f in *; do if [ "$f" != "www" ]; then cp -a "$f" www/; fi; done
+          ls www | head -n 20
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "BSN App" com.bsn.app --web-dir=.
+          npx cap init "BSN App" com.bsn.app --web-dir=www
           npx cap add android
           npx cap sync android
           cd android
