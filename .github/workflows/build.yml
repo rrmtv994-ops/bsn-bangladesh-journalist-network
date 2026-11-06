@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - name: Unzip and Prepare
         run: |
           unzip -o BSN_Priority2_Fixed_V3.zip -d web-app
