@@ -28,7 +28,7 @@ jobs:
           echo "Using folder: $DIR"
           mkdir -p www
           find "$DIR" -maxdepth 1 -mindepth 1 ! -name www -exec cp -a {} www/ \;
-          ls www | head -n 20
+          echo '<h1>BSN App</h1>' > www/index.html
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "BSN App" com.bsn.app --web-dir=www
           npx cap add android
