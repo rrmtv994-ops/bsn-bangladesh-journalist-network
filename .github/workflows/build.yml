@@ -1,28 +1,35 @@
 name: Build APK
-on: [push]
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Unzip V3
-        run: unzip -o BSN_Priority2_Fixed_V3.zip -d app-src
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-node@v4
         with:
-          java-version: '17'
+          node-version: '20'
+      - uses: actions/setup-java@v4
+        with:
           distribution: 'temurin'
+          java-version: '17'
+      - name: Unzip and Prepare
+        run: |
+          unzip -o BSN_Priority2_Fixed_V3.zip -d web-app
+          ls -R web-app | head -n 100
       - name: Build with Capacitor
         run: |
-          npm install -g @capacitor/cli
-          mkdir web-app && cp -r app-src/* web-app/ || cp -r app-src/*/* web-app/
           cd web-app
-          npm init -y
           npm install @capacitor/core @capacitor/cli
-          npx cap init BSN com.bsn.app --web-dir=.
+          npx cap init "BSN App" com.bsn.app --web-dir=.
           npx cap add android
-          cd android && chmod +x gradlew && ./gradlew assembleDebug
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: BSN-APK
-          path: web-app/android/app/build/outputs/apk/debug/*.apk
+          path: web-app/android/app/build/outputs/apk/debug/app-debug.apk
