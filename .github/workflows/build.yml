@@ -35,7 +35,7 @@ jobs:
           npx cap sync android
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug -Pkotlin.version=1.9.22
       - uses: actions/upload-artifact@v4
         with:
           name: BSN-APK
