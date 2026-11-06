@@ -6,57 +6,96 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    name: Build User and Admin APK
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. Download Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Check ZIP File
+      # 2. Check ZIP
+      - name: Verify BSN ZIP
         run: |
           if [ ! -f "BSN_Priority2_Fixed_V3.zip" ]; then
-            echo "ERROR: BSN ZIP file not found!"
+            echo "ERROR: BSN_Priority2_Fixed_V3.zip not found!"
             exit 1
           fi
 
+      # 3. Extract Original Android Project
       - name: Extract BSN Project
         run: |
+          mkdir -p bsn-project
           unzip -q BSN_Priority2_Fixed_V3.zip -d bsn-project
-          ls -la bsn-project
 
+          echo "Checking Android project..."
+          test -f bsn-project/settings.gradle.kts
+          test -f bsn-project/app/build.gradle.kts
+          test -f bsn-project/admin/build.gradle.kts
+
+      # 4. Setup Java 17
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
+      # 5. Setup Android SDK Without Old Tools
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
+      # 6. Install Required Android SDK
       - name: Install Android SDK Packages
         run: |
-          sdkmanager "platform-tools" \
-                     "platforms;android-36.1" \
-                     "build-tools;36.0.0"
+          sdkmanager --install \
+            "platforms;android-36.1" \
+            "build-tools;36.0.0"
 
+          sdkmanager --licenses
+
+      # 7. Install Required Gradle 9.3.1
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
 
-      - name: Build Both APKs
+      # 8. Generate Admin Debug Keystore
+      - name: Create Admin Debug Keystore
+        working-directory: bsn-project
         run: |
-          cd bsn-project
+          if [ ! -f "debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000
+          fi
+
+      # 9. Build Both Android Applications
+      - name: Build BSN User and Admin APK
+        working-directory: bsn-project
+        run: |
           gradle --no-daemon --stacktrace \
             :app:assembleDebug \
             :admin:assembleDebug
 
-      - name: Upload BSN APK Files
+      # 10. Upload Both APK Files
+      - name: Upload BSN APK
         uses: actions/upload-artifact@v4
         with:
-          name: BSN-APK-Files
+          name: BSN-User-and-Admin-APK
           path: |
             bsn-project/app/build/outputs/apk/debug/*.apk
             bsn-project/admin/build/outputs/apk/debug/*.apk
