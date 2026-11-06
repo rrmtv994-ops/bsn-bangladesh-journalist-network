@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
       - name: Unzip and Prepare
         run: |
-          unzip -o BSN-Website-Complete.zip -d web-app
+          unzip -o BSN_Priority2_Fixed_V3.zip -d web-app
           ls -R web-app | head -n 100
       - name: Build with Capacitor
         run: |
