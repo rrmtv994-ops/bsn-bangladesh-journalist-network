@@ -1,42 +1,64 @@
-name: Build APK
+name: Build BSN APK
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-      - name: Unzip and Prepare
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check ZIP File
         run: |
-          unzip -o BSN_Priority2_Fixed_V3.zip -d web-app
-          find web-app -name "index.html" | head -n 20
-      - name: Build with Capacitor
+          if [ ! -f "BSN_Priority2_Fixed_V3.zip" ]; then
+            echo "ERROR: BSN ZIP file not found!"
+            exit 1
+          fi
+
+      - name: Extract BSN Project
         run: |
-          cd web-app
-          INDEX=$(find . -name "index.html" | head -n 1)
-          echo "Found index at: $INDEX"
-          DIR=$(dirname "$INDEX")
-          echo "Using folder: $DIR"
-          mkdir -p www
-          find "$DIR" -maxdepth 1 -mindepth 1 ! -name www -exec cp -a {} www/ \;
-          echo '<h1>BSN App</h1>' > www/index.html
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "BSN App" com.bsn.app --web-dir=www
-          npx cap add android
-          npx cap sync android
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug -Pkotlin.version=1.9.22
-      - uses: actions/upload-artifact@v4
+          unzip -q BSN_Priority2_Fixed_V3.zip -d bsn-project
+          ls -la bsn-project
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          name: BSN-APK
-          path: web-app/android/app/build/outputs/apk/debug/app-debug.apk
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK Packages
+        run: |
+          sdkmanager "platform-tools" \
+                     "platforms;android-36.1" \
+                     "build-tools;36.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Build Both APKs
+        run: |
+          cd bsn-project
+          gradle --no-daemon --stacktrace \
+            :app:assembleDebug \
+            :admin:assembleDebug
+
+      - name: Upload BSN APK Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: BSN-APK-Files
+          path: |
+            bsn-project/app/build/outputs/apk/debug/*.apk
+            bsn-project/admin/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
