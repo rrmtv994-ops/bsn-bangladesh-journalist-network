@@ -27,7 +27,7 @@ jobs:
           DIR=$(dirname "$INDEX")
           echo "Using folder: $DIR"
           mkdir -p www
-          cp -a "$DIR"/. www/
+          find "$DIR" -maxdepth 1 -mindepth 1 ! -name www -exec cp -a {} www/ \;
           ls www | head -n 20
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "BSN App" com.bsn.app --web-dir=www
